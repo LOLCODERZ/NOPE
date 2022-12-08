@@ -9,6 +9,7 @@ target_sources(
     ${target}
     PRIVATE
     main.cpp
+    src/vm.cpp
     src/test.cpp
 )
 
