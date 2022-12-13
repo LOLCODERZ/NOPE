@@ -6,7 +6,7 @@ enum Instruction {
     Add16,
     // Add32,
     // Add64,
-    
+
     Subtract,
     Multiply,
     Divide,
@@ -15,7 +15,7 @@ enum Instruction {
     JumpNotEqual,
     // Merge,
     // Split,
-    // Append,
+    Append,
     // Load,
     Interrupt
 };

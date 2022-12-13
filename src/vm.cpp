@@ -106,6 +106,18 @@ bool VM::execute_instruction(Instruction instruction, uint8_t arg0) {
                 this->program_counter = arg0;
             }
         } break;
+
+        // case Instruction::Append: {
+        //     // Check if there is enough space on the stack
+        //     if (this->stack_pointer + 1 >= STACK_SIZE) {
+        //         throw "ERROR: Stack overflow";
+        //         return false;
+        //     }
+        //     // Increment the size of the stack to make space for the new element
+        //     this->stack_pointer++;
+        //     // Append the element to the end of the stack
+        //     this->stack[this->stack_pointer - 1] = arg0;
+        // } break;
         
         case Instruction::Interrupt: {
             return false;
