@@ -1,5 +1,6 @@
 enum Instruction {
-    PushStack = 0x00,
+    Push = 0x00,
+    Pop,
     Add,
     Subtract,
     Multiply,

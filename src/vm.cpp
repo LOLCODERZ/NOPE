@@ -2,7 +2,7 @@
 
 bool VM::execute_instruction(Instruction instruction, uint8_t arg0) {
     switch (instruction) {
-        case Instruction::PushStack:
+        case Instruction::Push:
             // Check if the stack is full
             if (this->stack_pointer >= STACK_SIZE) {
                 throw "ERROR: Stack overflow";
@@ -10,6 +10,16 @@ bool VM::execute_instruction(Instruction instruction, uint8_t arg0) {
             }
             // Push the argument onto the stack
             this->stack[this->stack_pointer++] = arg0;
+            break;
+
+        case Instruction::Pop:
+            // Check if the stack is empty
+            if (this->stack_pointer == 0) {
+                throw "ERROR: Stack underflow";
+                return false;
+            }
+            // Pop the top element from the stack
+            this->stack_pointer--;
             break;
 
         case Instruction::Add: {
