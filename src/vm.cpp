@@ -3,6 +3,11 @@
 bool VM::execute_instruction(Instruction instruction, uint8_t arg0) {
     switch (instruction) {
         case Instruction::PushStack:
+            // Check if the stack is full
+            if (this->stack_pointer >= STACK_SIZE) {
+                throw "ERROR: Stack overflow";
+                return false;
+            }
             // Push the argument onto the stack
             this->stack[this->stack_pointer++] = arg0;
             break;
@@ -85,7 +90,6 @@ bool VM::execute_instruction(Instruction instruction, uint8_t arg0) {
     
     return true;
 }
-
 
 void VM::debug() {
     std::cout << "----- Lolcode VM -----" << std::endl;
