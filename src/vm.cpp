@@ -2,7 +2,7 @@
 
 bool VM::execute_instruction(Instruction instruction, uint8_t arg0) {
     switch (instruction) {
-        case Instruction::Push:
+        case Instruction::Push: {
             // Check if the stack is full
             if (this->stack_pointer >= STACK_SIZE) {
                 throw "ERROR: Stack overflow";
@@ -10,9 +10,9 @@ bool VM::execute_instruction(Instruction instruction, uint8_t arg0) {
             }
             // Push the argument onto the stack
             this->stack[this->stack_pointer++] = arg0;
-            break;
+            } break;
 
-        case Instruction::Pop:
+        case Instruction::Pop: {
             // Check if the stack is empty
             if (this->stack_pointer == 0) {
                 throw "ERROR: Stack underflow";
@@ -20,7 +20,7 @@ bool VM::execute_instruction(Instruction instruction, uint8_t arg0) {
             }
             // Pop the top element from the stack
             this->stack_pointer--;
-            break;
+            } break;
 
         case Instruction::Add: {
             // Get the two operands from the stack: This goes for all following operation cases
@@ -34,6 +34,19 @@ bool VM::execute_instruction(Instruction instruction, uint8_t arg0) {
                 return false;
             }
         } break;
+
+        // case Instruction::Add16: {
+        //     // Get the two operands from the stack
+        //     uint16_t left_side = this->stack[--this->stack_pointer];
+        //     uint16_t right_side = this->stack[--this->stack_pointer];
+        //     // Add them together and push the result onto the stack
+        //     this->stack[this->stack_pointer++] = left_side + right_side;
+
+        //     // Check under and overflow
+        //     if (this->stack[this->stack_pointer - 1] < left_side || this->stack[this->stack_pointer - 1] < right_side) {
+        //         return false;
+        //     }
+        // }
 
         case Instruction::Subtract: {
             uint8_t left_side = this->stack[--this->stack_pointer];
@@ -94,8 +107,9 @@ bool VM::execute_instruction(Instruction instruction, uint8_t arg0) {
             }
         } break;
         
-        case Instruction::Interrupt:
+        case Instruction::Interrupt: {
             return false;
+        }
     }
     
     return true;
