@@ -25,7 +25,6 @@ bool VM::execute_instruction(Instruction instruction, uint8_t arg0) {
         case Instruction::Push: {
             // Check if the stack is full
             if (this->stack_pointer >= STACK_SIZE) {
-                this->overflow = true;
                 throw "ERROR: Stack overflow";
             }
             // Push the argument onto the stack
@@ -112,60 +111,60 @@ bool VM::execute_instruction(Instruction instruction, uint8_t arg0) {
 
 // ================ Multi-byte operations ================
 
-        case Instruction::Add16: {
-            // Interpret 8 bit operands to 16 bit
-            uint16_t left_side = this->stack_pop();
-            uint16_t right_side = this->stack_pop();
-            // Add them together and push the result onto the stack as two 8 bit operands
-            this->stack_push((left_side + right_side) & 0xFF);
-            this->address_map[this->stack_pointer - 2] = (left_side + right_side) & 0xFF;
-            this->stack_push((left_side + right_side) >> 8);
-            this->address_map[this->stack_pointer - 1] = (left_side + right_side) >> 8;
+        // case Instruction::Add16: {
+        //     // Interpret 8 bit operands to 16 bit
+        //     uint16_t left_side = this->stack_pop();
+        //     uint16_t right_side = this->stack_pop();
+        //     // Add them together and push the result onto the stack as two 8 bit operands
+        //     this->stack_push((left_side + right_side) & 0xFF);
+        //     this->address_map[this->stack_pointer - 2] = (left_side + right_side) & 0xFF;
+        //     this->stack_push((left_side + right_side) >> 8);
+        //     this->address_map[this->stack_pointer - 1] = (left_side + right_side) >> 8;
 
-            // Check for overflow
-            if (left_side > 0xFFFF - right_side) {
-                this->overflow = true;
-                throw "ERROR: Stack overflow";
-            }
-        } break;
+        //     // Check for overflow
+        //     if (left_side > 0xFFFF - right_side) {
+        //         this->overflow = true;
+        //         throw "ERROR: Stack overflow";
+        //     }
+        // } break;
 
-        case Instruction::Add32: {
-            // Interpret 8 bit operands to 32 bit
-            uint32_t left_side = this->stack_pop();
-            uint32_t right_side = this->stack_pop();
-            // Add them together and push the result onto the stack as four 8 bit operands
-            this->stack_push((left_side + right_side) & 0xFF);
-            this->stack_push((left_side + right_side) >> 8);
-            this->stack_push((left_side + right_side) >> 16);
-            this->stack_push((left_side + right_side) >> 24);
+        // case Instruction::Add32: {
+        //     // Interpret 8 bit operands to 32 bit
+        //     uint32_t left_side = this->stack_pop();
+        //     uint32_t right_side = this->stack_pop();
+        //     // Add them together and push the result onto the stack as four 8 bit operands
+        //     this->stack_push((left_side + right_side) & 0xFF);
+        //     this->stack_push((left_side + right_side) >> 8);
+        //     this->stack_push((left_side + right_side) >> 16);
+        //     this->stack_push((left_side + right_side) >> 24);
 
-            // Check for overflow
-            if (left_side > 0xFFFFFFFF - right_side) {
-                this->overflow = true;
-                throw "ERROR: Stack overflow";
-            }
-        } break;
+        //     // Check for overflow
+        //     if (left_side > 0xFFFFFFFF - right_side) {
+        //         this->overflow = true;
+        //         throw "ERROR: Stack overflow";
+        //     }
+        // } break;
 
-        case Instruction::Add64: {
-            // Interpret 8 bit operands to 64 bit
-            uint64_t left_side = this->stack_pop();
-            uint64_t right_side = this->stack_pop();
-            // Add them together and push the result onto the stack as eight 8 bit operands
-            this->stack_push((left_side + right_side) & 0xFF);
-            this->stack_push((left_side + right_side) >> 8);
-            this->stack_push((left_side + right_side) >> 16);
-            this->stack_push((left_side + right_side) >> 24);
-            this->stack_push((left_side + right_side) >> 32);
-            this->stack_push((left_side + right_side) >> 40);
-            this->stack_push((left_side + right_side) >> 48);
-            this->stack_push((left_side + right_side) >> 56);
+        // case Instruction::Add64: {
+        //     // Interpret 8 bit operands to 64 bit
+        //     uint64_t left_side = this->stack_pop();
+        //     uint64_t right_side = this->stack_pop();
+        //     // Add them together and push the result onto the stack as eight 8 bit operands
+        //     this->stack_push((left_side + right_side) & 0xFF);
+        //     this->stack_push((left_side + right_side) >> 8);
+        //     this->stack_push((left_side + right_side) >> 16);
+        //     this->stack_push((left_side + right_side) >> 24);
+        //     this->stack_push((left_side + right_side) >> 32);
+        //     this->stack_push((left_side + right_side) >> 40);
+        //     this->stack_push((left_side + right_side) >> 48);
+        //     this->stack_push((left_side + right_side) >> 56);
 
-            // Check for overflow
-            if (left_side > 0xFFFFFFFFFFFFFFFF - right_side) {
-                this->overflow = true;
-                throw "ERROR: Stack overflow";
-            }
-        } break;
+        //     // Check for overflow
+        //     if (left_side > 0xFFFFFFFFFFFFFFFF - right_side) {
+        //         this->overflow = true;
+        //         throw "ERROR: Stack overflow";
+        //     }
+        // } break;
 
 
 // ================ Compare instructions ================

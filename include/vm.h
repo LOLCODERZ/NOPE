@@ -11,7 +11,7 @@ public:
     uint8_t stack[STACK_SIZE];
     
     // Map to store the addresses of the variables
-    std::map<uint8_t, uint8_t> address_map;
+    std::map<uintptr_t, uintptr_t> address_map;
 
     // Stack pointer that points to the top of the stack
     uintptr_t stack_pointer;
