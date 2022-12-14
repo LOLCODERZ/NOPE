@@ -13,7 +13,7 @@ enum Instruction {
     Jump,
     JumpEqual,
     JumpNotEqual,
-    // Merge,
+    Merge,
     // Split,
     Append,
     // Load,

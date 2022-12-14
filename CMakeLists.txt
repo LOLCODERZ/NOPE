@@ -11,6 +11,7 @@ target_sources(
     main.cpp
     src/vm.cpp
     src/test.cpp
+    src/data_layout.cpp
 )
 
 target_include_directories(${target} PRIVATE include/)

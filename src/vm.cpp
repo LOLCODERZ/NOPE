@@ -8,9 +8,15 @@ bool VM::execute_instruction(Instruction instruction, uint8_t arg0) {
                 throw "ERROR: Stack overflow";
                 return false;
             }
+            // Register the data to the stack layout
+            this->stack_layout.push_back(DataLayout {
+                this->stack_pointer, 
+                this->stack_pointer + 1,
+                1                           // 1 Byte
+            });
             // Push the argument onto the stack
             this->stack[this->stack_pointer++] = arg0;
-            } break;
+        } break;
 
         case Instruction::Pop: {
             // Check if the stack is empty
@@ -19,8 +25,10 @@ bool VM::execute_instruction(Instruction instruction, uint8_t arg0) {
                 return false;
             }
             // Pop the top element from the stack
-            this->stack_pointer--;
-            } break;
+            auto last_layout = this->stack_layout.back();
+            this->stack_pointer = last_layout.m_low_address;
+            this->stack_layout.pop_back();
+        } break;
 
         case Instruction::Add: {
             // Get the two operands from the stack: This goes for all following operation cases
@@ -105,6 +113,17 @@ bool VM::execute_instruction(Instruction instruction, uint8_t arg0) {
             if (lhs != rhs) {
                 this->program_counter = arg0;
             }
+        } break;
+
+        case Instruction::Merge: {
+            auto last_layout = this->stack_layout.back();
+            stack_layout.pop_back();
+            auto new_last_layout = this->stack_layout.back();
+            if (last_layout.m_data_size != new_last_layout.m_data_size) {
+                throw "ERROR: Could not merge, the data types are different";
+            }
+            new_last_layout.m_high_address = last_layout.m_high_address;
+            new_last_layout.m_data_size *= 2;
         } break;
 
         // case Instruction::Append: {
