@@ -1,21 +1,33 @@
 enum Instruction {
+    // ===== Manipulation =====
     Push = 0x00,
-    
-    Add,
-    Subtract,
-    Multiply,
-    Divide,
-    
-    Add16,
-    // Add32,
-    // Add64,
-
-    Jump,
-    JumpEqual,
-    JumpNotEqual,
     // Merge,
     // Split,
     Append,
     // Load,
-    Interrupt
+    Interrupt,
+    
+// ======== Operations =========
+    Add,
+    Subtract,
+    Multiply,
+    Divide,
+
+// === Multi-byte operations ===
+    Add16,
+    Add32,
+    Add64,
+
+// ======== Comparisons ========
+    Equal,
+    NotEqual,
+    GreaterThan,
+    LessThan,
+    GreaterThanOrEqual,
+    LessThanOrEqual,
+
+// ========== Jumping ==========
+    Jump,
+    JumpEqual,
+    JumpNotEqual
 };
