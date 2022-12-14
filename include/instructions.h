@@ -1,15 +1,15 @@
 enum Instruction {
     Push = 0x00,
-    Pop,
+    
     Add,
-
+    Subtract,
+    Multiply,
+    Divide,
+    
     Add16,
     // Add32,
     // Add64,
 
-    Subtract,
-    Multiply,
-    Divide,
     Jump,
     JumpEqual,
     JumpNotEqual,
