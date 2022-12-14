@@ -14,9 +14,9 @@ enum Instruction {
     Divide,
 
 // === Multi-byte operations ===
-    Add16,
-    Add32,
-    Add64,
+    // Add16,
+    // Add32,
+    // Add64,
 
 // ======== Comparisons ========
     Equal,
