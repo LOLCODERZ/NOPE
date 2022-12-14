@@ -12,13 +12,19 @@ public:
     uintptr_t stack_pointer;
     // Program counter that points to the next instruction
     uintptr_t program_counter;
+    // Booleans to keep track of overflow and underflow
+    bool overflow;
+    bool underflow;
 
 // Functions
 public:
-    bool execute_instruction(Instruction instruction, uint8_t arg0);
+    // Push function to handle the stack
+    void stack_push(uint8_t value);
 
     // Pop function to handle the stack
-    uint8_t pop();
+    uint8_t stack_pop();
+
+    bool execute_instruction(Instruction instruction, uint8_t arg0);
 
     void debug();
 };
