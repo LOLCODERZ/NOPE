@@ -12,16 +12,6 @@ bool VM::execute_instruction(Instruction instruction, uint8_t arg0) {
             this->stack[this->stack_pointer++] = arg0;
             } break;
 
-        case Instruction::Pop: {
-            // Check if the stack is empty
-            if (this->stack_pointer == 0) {
-                throw "ERROR: Stack underflow";
-                return false;
-            }
-            // Pop the top element from the stack
-            this->stack_pointer--;
-            } break;
-
         case Instruction::Add: {
             // Get the two operands from the stack: This goes for all following operation cases
             uint8_t left_side = this->stack[--this->stack_pointer];
@@ -35,18 +25,6 @@ bool VM::execute_instruction(Instruction instruction, uint8_t arg0) {
             }
         } break;
 
-        // case Instruction::Add16: {
-        //     // Get the two operands from the stack
-        //     uint16_t left_side = this->stack[--this->stack_pointer];
-        //     uint16_t right_side = this->stack[--this->stack_pointer];
-        //     // Add them together and push the result onto the stack
-        //     this->stack[this->stack_pointer++] = left_side + right_side;
-
-        //     // Check under and overflow
-        //     if (this->stack[this->stack_pointer - 1] < left_side || this->stack[this->stack_pointer - 1] < right_side) {
-        //         return false;
-        //     }
-        // }
 
         case Instruction::Subtract: {
             uint8_t left_side = this->stack[--this->stack_pointer];
@@ -84,6 +62,19 @@ bool VM::execute_instruction(Instruction instruction, uint8_t arg0) {
             }
         } break;
 
+        case Instruction::Add16: {
+            // Get the two operands from the stack
+            uint16_t left_side = this->stack[--this->stack_pointer];
+            uint16_t right_side = this->stack[--this->stack_pointer];
+            // Add them together and push the result onto the stack
+            this->stack[this->stack_pointer++] = left_side + right_side;
+
+            // Check under and overflow
+            if (this->stack[this->stack_pointer - 1] < left_side || this->stack[this->stack_pointer - 1] < right_side) {
+                return false;
+            }
+        } break;
+
         case Instruction::Jump: {
             // Jump to the specified address
             this->program_counter = arg0;
@@ -107,17 +98,17 @@ bool VM::execute_instruction(Instruction instruction, uint8_t arg0) {
             }
         } break;
 
-        // case Instruction::Append: {
-        //     // Check if there is enough space on the stack
-        //     if (this->stack_pointer + 1 >= STACK_SIZE) {
-        //         throw "ERROR: Stack overflow";
-        //         return false;
-        //     }
-        //     // Increment the size of the stack to make space for the new element
-        //     this->stack_pointer++;
-        //     // Append the element to the end of the stack
-        //     this->stack[this->stack_pointer - 1] = arg0;
-        // } break;
+        case Instruction::Append: {
+            // Check if there is enough space on the stack
+            if (this->stack_pointer + 1 >= STACK_SIZE) {
+                throw "ERROR: Stack overflow";
+                return false;
+            }
+            // Increment the size of the stack to make space for the new element
+            this->stack_pointer++;
+            // Append the element to the end of the stack
+            this->stack[this->stack_pointer - 1] = arg0;
+        } break;
         
         case Instruction::Interrupt: {
             return false;
@@ -125,6 +116,16 @@ bool VM::execute_instruction(Instruction instruction, uint8_t arg0) {
     }
     
     return true;
+}
+
+uint8_t VM::pop() {
+    // Check if the stack is empty
+    if (this->stack_pointer == 0) {
+        throw "ERROR: Stack underflow";
+        return 0;
+    }
+    // Return the top element of the stack
+    return this->stack[--this->stack_pointer];
 }
 
 void VM::debug() {

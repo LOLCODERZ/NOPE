@@ -17,5 +17,8 @@ public:
 public:
     bool execute_instruction(Instruction instruction, uint8_t arg0);
 
+    // Pop function to handle the stack
+    uint8_t pop();
+
     void debug();
 };
