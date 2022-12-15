@@ -1,3 +1,5 @@
+#include <sstream>
+#include <fstream>
 #include "vm.h"
 
 bool VM::execute_instruction(Instruction instruction, uint8_t arg0) {
@@ -16,8 +18,7 @@ bool VM::execute_instruction(Instruction instruction, uint8_t arg0) {
             Data sum = left_hand_side + right_hand_side;
             this->overflow_flag = sum.m_overflow;
             this->stack_push(sum);
-        }
-            break;
+        } break;
 
         case Instruction::Subtract: {
             Data left_hand_side = this->stack_pop();
@@ -131,6 +132,12 @@ bool VM::execute_instruction(Instruction instruction, uint8_t arg0) {
                 std::cout << (char) data.m_data[i];
             }
         } break;
+
+        case Instruction::Clone: {
+            Data data = this->stack_pop();
+            this->stack_push(data);
+            this->stack_push(data);
+        } break;
         
         case Instruction::Interrupt: {
             return false;
@@ -218,5 +225,67 @@ void VM::execute(bool debug) {
         if (debug) {
             this->debug();
         }
+    }
+}
+
+void VM::parse(const std::string& str) {
+    std::map<std::string, int> labels;
+
+    std::ifstream f(str);
+    std::string line;
+    int i = 0;
+    while (std::getline(f, line)) {
+        std::istringstream f2(line);
+        if (line.starts_with('$')) {
+            std::string label;
+            f2 >> label;
+            labels.insert(std::make_pair(label, i));
+        }
+        std::string instruction;
+        f2 >> instruction;
+        if (instruction == "PUSH") {
+            std::string value;
+            f2 >> value;
+            unsigned char num;
+            if (value.starts_with('\'')) {
+                num = (unsigned char) value[1];
+            } else if (value.starts_with('$')) {
+                std::string label;
+                f2 >> label;
+                num = labels[label];
+            } else {
+                num = std::stoi(value);
+            }
+            this->add(Instruction::Push, num);
+        } else if (instruction == "POP") {
+            this->add(Instruction::Pop, 0);
+        } else if (instruction == "ADD") {
+            this->add(Instruction::Add, 0);
+        } else if (instruction == "SUB") {
+            this->add(Instruction::Subtract, 0);
+        } else if (instruction == "MUL") {
+            this->add(Instruction::Multiply, 0);
+        } else if (instruction == "DIV") {
+            this->add(Instruction::Divide, 0);
+        } else if (instruction == "JMP") {
+            this->add(Instruction::Jump, 0);
+        } else if (instruction == "JMPEQ") {
+            this->add(Instruction::JumpEqual, 0);
+        } else if (instruction == "MERGE") {
+            this->add(Instruction::Merge, 0);
+        } else if (instruction == "APPEND") {
+            this->add(Instruction::Append, 0);
+        } else if (instruction == "STORE") {
+            this->add(Instruction::Store, 0);
+        } else if (instruction == "LOAD") {
+            this->add(Instruction::Load, 0);
+        } else if (instruction == "OUT") {
+            this->add(Instruction::Out, 0);
+        } else if (instruction == "CLONE") {
+            this->add(Instruction::Clone, 0);
+        } else if (instruction == "INTERRUPT") {
+            this->add(Instruction::Interrupt, 0);
+        }
+        i += 1;
     }
 }

@@ -33,6 +33,8 @@ public:
     void execute(bool debug);
     bool execute_instruction(Instruction instruction, uint8_t arg0);
 
+    void parse(const std::string& str);
+
     void debug();
 
 private:

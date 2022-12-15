@@ -29,5 +29,7 @@ enum Instruction {
     // Print the last data to the console
     Out,
     // Stop the program
-    Interrupt
+    Interrupt,
+    // Clone the data
+    Clone
 };

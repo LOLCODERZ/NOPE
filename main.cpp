@@ -1,5 +1,6 @@
 #include "test.h"
 #include "vm.h"
+#include "fstream"
 
 int main() {
     VM vm = VM();
@@ -62,16 +63,7 @@ int main() {
     // End of program
     vm.add(Instruction::Interrupt, 0);*/
 
-    vm.add(Instruction::Push, 'H');
-    vm.add(Instruction::Push, 'e');
-    vm.add(Instruction::Append, 0);
-    vm.add(Instruction::Push, 'l');
-    vm.add(Instruction::Append, 0);
-    vm.add(Instruction::Push, 'l');
-    vm.add(Instruction::Append, 0);
-    vm.add(Instruction::Push, 'o');
-    vm.add(Instruction::Append, 0);
-    vm.add(Instruction::Out, 0);
+    vm.parse("/home/remy/apc-proj/NOPE/res/main.bytecat");
 
     vm.execute(false);
 
