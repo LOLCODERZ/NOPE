@@ -2,116 +2,69 @@
 
 bool VM::execute_instruction(Instruction instruction, uint8_t arg0) {
     switch (instruction) {
-        case Instruction::Push: {
-            // Check if the stack is full
-            if (this->stack_pointer >= STACK_SIZE) {
-                throw "ERROR: Stack overflow";
-                return false;
-            }
-            // Register the data to the stack layout
-            this->stack_layout.push_back(DataLayout {
-                this->stack_pointer, 
-                this->stack_pointer + 1,
-                1                           // 1 Byte
-            });
-            // Push the argument onto the stack
-            this->stack[this->stack_pointer++] = arg0;
-        } break;
+        case Instruction::Push:
+            this->stack_push(arg0);
+            break;
 
-        case Instruction::Pop: {
-            // Check if the stack is empty
-            if (this->stack_pointer == 0) {
-                throw "ERROR: Stack underflow";
-                return false;
-            }
-            // Pop the top element from the stack
-            auto last_layout = this->stack_layout.back();
-            this->stack_pointer = last_layout.m_low_address;
-            this->stack_layout.pop_back();
-        } break;
+        case Instruction::Pop:
+            this->stack_pop();
+            break;
 
         case Instruction::Add: {
-            // Get the two operands from the stack: This goes for all following operation cases
-            uint8_t left_side = this->stack[--this->stack_pointer];
-            uint8_t right_side = this->stack[--this->stack_pointer];
-            // Add them together and push the result onto the stack
-            this->stack[this->stack_pointer++] = left_side + right_side;
-            
-            // Check under and overflow
-            if (this->stack[this->stack_pointer - 1] < left_side || this->stack[this->stack_pointer - 1] < right_side) {
-                return false;
-            }
+            Data left_hand_side = this->stack_pop();
+            Data right_hand_side = this->stack_pop();
+            Data sum = left_hand_side + right_hand_side;
+            this->overflow_flag = sum.m_overflow;
+            this->stack_push(sum);
         } break;
 
-        // case Instruction::Add16: {
-        //     // Get the two operands from the stack
-        //     uint16_t left_side = this->stack[--this->stack_pointer];
-        //     uint16_t right_side = this->stack[--this->stack_pointer];
-        //     // Add them together and push the result onto the stack
-        //     this->stack[this->stack_pointer++] = left_side + right_side;
-
-        //     // Check under and overflow
-        //     if (this->stack[this->stack_pointer - 1] < left_side || this->stack[this->stack_pointer - 1] < right_side) {
-        //         return false;
-        //     }
-        // }
-
         case Instruction::Subtract: {
-            uint8_t left_side = this->stack[--this->stack_pointer];
-            uint8_t right_side = this->stack[--this->stack_pointer];
-            // Subtract and push the result onto the stack
-            this->stack[this->stack_pointer++] = left_side - right_side;
-
-            // Check under and overflow
-            if (this->stack[this->stack_pointer - 1] > left_side || this->stack[this->stack_pointer - 1] > right_side) {
-                return false;
-            }
+            Data left_hand_side = this->stack_pop();
+            Data right_hand_side = this->stack_pop();
+            Data sum = left_hand_side - right_hand_side;
+            this->overflow_flag = sum.m_overflow;
+            this->stack_push(sum);
         } break;
 
         case Instruction::Multiply: {
-            uint8_t left_side = this->stack[--this->stack_pointer];
-            uint8_t right_side = this->stack[--this->stack_pointer];
-            // Multiply and push the result onto the stack
-            this->stack[this->stack_pointer++] = left_side * right_side;
-
-            // Check for under and overflow
-            if (this->stack[this->stack_pointer - 1] < left_side || this->stack[this->stack_pointer - 1] < right_side) {
-                return false;
-            }
+            Data left_hand_side = this->stack_pop();
+            Data right_hand_side = this->stack_pop();
+            Data sum = left_hand_side * right_hand_side;
+            this->overflow_flag = sum.m_overflow;
+            this->stack_push(sum);
         } break;
 
         case Instruction::Divide: {
-            uint8_t left_side = this->stack[--this->stack_pointer];
-            uint8_t right_side = this->stack[--this->stack_pointer];
-            // Divide and push the result onto the stack
-            this->stack[this->stack_pointer++] = left_side / right_side;
-
-            // Check under and overflow
-            if (this->stack[this->stack_pointer - 1] > left_side || this->stack[this->stack_pointer - 1] < right_side) {
-                return false;
-            }
+            Data left_hand_side = this->stack_pop();
+            Data right_hand_side = this->stack_pop();
+            Data sum = left_hand_side / right_hand_side;
+            this->overflow_flag = sum.m_overflow;
+            this->stack_push(sum);
         } break;
 
         case Instruction::Jump: {
             // Jump to the specified address
-            this->program_counter = arg0;
+            Data address = this->stack_pop();
+            this->program_counter = address.as_uintptr();
         } break;
 
         case Instruction::JumpEqual: {
-            uint8_t lhs = this->stack[--this->stack_pointer];
-            uint8_t rhs = this->stack[this->stack_pointer];
+            Data address = this->stack_pop();
+            Data left_hand_side = this->stack_pop();
+            Data right_hand_side = this->stack_pop();
             // Check if the two operands are equal
-            if (lhs == rhs) {
-                this->program_counter = arg0;
+            if (left_hand_side == right_hand_side) {
+                this->program_counter = address.as_uintptr();
             }
         } break;
 
         case Instruction::JumpNotEqual: {
-            uint8_t lhs = this->stack[--this->stack_pointer];
-            uint8_t rhs = this->stack[this->stack_pointer];
-            // Check if the two operands are not equal
-            if (lhs != rhs) {
-                this->program_counter = arg0;
+            Data address = this->stack_pop();
+            Data left_hand_side = this->stack_pop();
+            Data right_hand_side = this->stack_pop();
+            // Check if the two operands are equal
+            if (left_hand_side != right_hand_side) {
+                this->program_counter = address.as_uintptr();
             }
         } break;
 
@@ -120,23 +73,47 @@ bool VM::execute_instruction(Instruction instruction, uint8_t arg0) {
             stack_layout.pop_back();
             auto new_last_layout = this->stack_layout.back();
             if (last_layout.m_data_size != new_last_layout.m_data_size) {
-                throw "ERROR: Could not merge, the data types are different";
+                throw std::runtime_error("ERROR: Could not merge, the data types are different");
             }
             new_last_layout.m_high_address = last_layout.m_high_address;
             new_last_layout.m_data_size *= 2;
         } break;
 
-        // case Instruction::Append: {
-        //     // Check if there is enough space on the stack
-        //     if (this->stack_pointer + 1 >= STACK_SIZE) {
-        //         throw "ERROR: Stack overflow";
-        //         return false;
-        //     }
-        //     // Increment the size of the stack to make space for the new element
-        //     this->stack_pointer++;
-        //     // Append the element to the end of the stack
-        //     this->stack[this->stack_pointer - 1] = arg0;
-        // } break;
+        case Instruction::Append: {
+            auto last_layout = this->stack_layout.back();
+            stack_layout.pop_back();
+            auto new_last_layout = this->stack_layout.back();
+            if (last_layout.m_data_size != new_last_layout.m_data_size) {
+                throw std::runtime_error("ERROR: Could not append, the data types are different");
+            }
+            new_last_layout.m_high_address = last_layout.m_high_address;
+        } break;
+
+        case Instruction::Store: {
+            Data address = this->stack_pop();
+            Data value = this->stack_pop();
+
+            auto it = this->variables.find(address.as_uintptr());
+            if (it != this->variables.end()) {
+                it->second = value;
+            } else {
+                this->variables.insert(std::make_pair(address.as_uintptr(), value));
+            }
+
+        } break;
+
+        case Instruction::Load: {
+            Data address = this->stack_pop();
+            auto address_uint = address.as_uintptr();
+
+            for (auto & variable : this->variables) {
+                if (variable.first == address_uint) {
+                    this->stack_push(variable.second);
+                    return true;
+                }
+            }
+            throw std::runtime_error("ERROR: Could not find variable!");
+        }
         
         case Instruction::Interrupt: {
             return false;
@@ -155,5 +132,74 @@ void VM::debug() {
         std::cout << (int) this->stack[i] << " ";
     }
     std::cout << std::endl << std::endl;
+    std::cout << "Layout (" << this->stack_layout.size() << "): " << std::endl;
+    for (auto &layout : this->stack_layout) {
+        std::cout << layout.to_string() << std::endl;
+    }
+    std::cout << std::endl;
+    std::cout << "Variables (" << this->variables.size() << "): " << std::endl;
+    for (auto &variable : this->variables) {
+        std::cout << variable.first << " => " << variable.second.m_layout.to_string() << std::endl;
+    }
+    std::cout << std::endl;
     std::cout << "Program Counter (" << this->program_counter << ")" << std::endl;
+    std::cout << std::endl << std::endl;
+}
+
+void VM::stack_push(uint8_t value) {
+    if (this->stack_pointer >= STACK_SIZE) {
+        throw std::overflow_error("Stack overflow :(");
+    }
+
+    this->stack_layout.emplace_back(
+        this->stack_pointer,
+        this->stack_pointer + 1,
+        1                           // 1 Byte
+    );
+    this->stack[this->stack_pointer++] = value;
+}
+
+void VM::stack_push(const Data& data) {
+    auto data_size = data.m_layout.m_high_address - data.m_layout.m_low_address;
+    if (this->stack_pointer + data_size >= STACK_SIZE) {
+        throw std::overflow_error("Stack overflow :(");
+    }
+
+    auto low_address = this->stack_pointer;
+    for (uintptr_t i = 0; i < data_size; i++) {
+        this->stack[this->stack_pointer++] = data.m_data[i];
+    }
+    auto high_address = this->stack_pointer;
+
+    this->stack_layout.emplace_back(low_address, high_address, data.m_layout.m_data_size);
+}
+
+Data VM::stack_pop() {
+    if (this->stack_layout.empty()) {
+        throw std::underflow_error("Stack underflow :(");
+    }
+    // Pop the layout
+    auto layout = this->stack_layout.back();
+    this->stack_layout.pop_back();
+
+    auto data = Data {this->stack, layout};
+    this->stack_pointer = layout.m_low_address;
+
+    return data;
+}
+
+void VM::add(Instruction instruction, uint8_t arg0) {
+    this->program.emplace_back(instruction, arg0);
+}
+
+void VM::execute(bool debug) {
+    while (this->program_counter < this->program.size()) {
+        auto instruction = this->program[this->program_counter++];
+        if (!this->execute_instruction(instruction.first, instruction.second)) {
+            break;
+        }
+        if (debug) {
+            this->debug();
+        }
+    }
 }
