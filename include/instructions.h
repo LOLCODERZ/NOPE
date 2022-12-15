@@ -26,6 +26,8 @@ enum Instruction {
     Store,
     // Load the data at address [arg0] to the stack (copy)
     Load,
+    // Print the last data to the console
+    Out,
     // Stop the program
     Interrupt
 };

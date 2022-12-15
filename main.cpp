@@ -40,7 +40,7 @@ int main() {
      */
 
     // int i = 0:
-    vm.add(Instruction::Push, 0);
+    /*vm.add(Instruction::Push, 0);
     vm.add(Instruction::Push, 0);
     vm.add(Instruction::Store, 0);
     // i != 10
@@ -60,10 +60,20 @@ int main() {
     vm.add(Instruction::Push, 3);
     vm.add(Instruction::Jump, 0);
     // End of program
-    vm.add(Instruction::Interrupt, 0);
+    vm.add(Instruction::Interrupt, 0);*/
 
-    vm.execute(true);
+    vm.add(Instruction::Push, 'H');
+    vm.add(Instruction::Push, 'e');
+    vm.add(Instruction::Append, 0);
+    vm.add(Instruction::Push, 'l');
+    vm.add(Instruction::Append, 0);
+    vm.add(Instruction::Push, 'l');
+    vm.add(Instruction::Append, 0);
+    vm.add(Instruction::Push, 'o');
+    vm.add(Instruction::Append, 0);
+    vm.add(Instruction::Out, 0);
 
-    print_hello();
+    vm.execute(false);
+
     return 0;
 }

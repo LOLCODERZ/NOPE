@@ -16,7 +16,8 @@ bool VM::execute_instruction(Instruction instruction, uint8_t arg0) {
             Data sum = left_hand_side + right_hand_side;
             this->overflow_flag = sum.m_overflow;
             this->stack_push(sum);
-        } break;
+        }
+            break;
 
         case Instruction::Subtract: {
             Data left_hand_side = this->stack_pop();
@@ -24,7 +25,8 @@ bool VM::execute_instruction(Instruction instruction, uint8_t arg0) {
             Data sum = left_hand_side - right_hand_side;
             this->overflow_flag = sum.m_overflow;
             this->stack_push(sum);
-        } break;
+        }
+            break;
 
         case Instruction::Multiply: {
             Data left_hand_side = this->stack_pop();
@@ -32,7 +34,8 @@ bool VM::execute_instruction(Instruction instruction, uint8_t arg0) {
             Data sum = left_hand_side * right_hand_side;
             this->overflow_flag = sum.m_overflow;
             this->stack_push(sum);
-        } break;
+        }
+            break;
 
         case Instruction::Divide: {
             Data left_hand_side = this->stack_pop();
@@ -40,13 +43,15 @@ bool VM::execute_instruction(Instruction instruction, uint8_t arg0) {
             Data sum = left_hand_side / right_hand_side;
             this->overflow_flag = sum.m_overflow;
             this->stack_push(sum);
-        } break;
+        }
+            break;
 
         case Instruction::Jump: {
             // Jump to the specified address
             Data address = this->stack_pop();
             this->program_counter = address.as_uintptr();
-        } break;
+        }
+            break;
 
         case Instruction::JumpEqual: {
             Data address = this->stack_pop();
@@ -56,7 +61,8 @@ bool VM::execute_instruction(Instruction instruction, uint8_t arg0) {
             if (left_hand_side == right_hand_side) {
                 this->program_counter = address.as_uintptr();
             }
-        } break;
+        }
+            break;
 
         case Instruction::JumpNotEqual: {
             Data address = this->stack_pop();
@@ -66,7 +72,8 @@ bool VM::execute_instruction(Instruction instruction, uint8_t arg0) {
             if (left_hand_side != right_hand_side) {
                 this->program_counter = address.as_uintptr();
             }
-        } break;
+        }
+            break;
 
         case Instruction::Merge: {
             auto last_layout = this->stack_layout.back();
@@ -77,12 +84,13 @@ bool VM::execute_instruction(Instruction instruction, uint8_t arg0) {
             }
             new_last_layout.m_high_address = last_layout.m_high_address;
             new_last_layout.m_data_size *= 2;
-        } break;
+        }
+            break;
 
         case Instruction::Append: {
             auto last_layout = this->stack_layout.back();
             stack_layout.pop_back();
-            auto new_last_layout = this->stack_layout.back();
+            auto& new_last_layout = this->stack_layout.back();
             if (last_layout.m_data_size != new_last_layout.m_data_size) {
                 throw std::runtime_error("ERROR: Could not append, the data types are different");
             }
@@ -100,13 +108,14 @@ bool VM::execute_instruction(Instruction instruction, uint8_t arg0) {
                 this->variables.insert(std::make_pair(address.as_uintptr(), value));
             }
 
-        } break;
+        }
+            break;
 
         case Instruction::Load: {
             Data address = this->stack_pop();
             auto address_uint = address.as_uintptr();
 
-            for (auto & variable : this->variables) {
+            for (auto &variable: this->variables) {
                 if (variable.first == address_uint) {
                     this->stack_push(variable.second);
                     return true;
@@ -114,6 +123,14 @@ bool VM::execute_instruction(Instruction instruction, uint8_t arg0) {
             }
             throw std::runtime_error("ERROR: Could not find variable!");
         }
+
+        case Instruction::Out: {
+            Data data = this->stack_pop();
+            uintptr_t data_size = data.m_layout.m_high_address - data.m_layout.m_low_address;
+            for (uintptr_t i = 0; i < data_size; i++) {
+                std::cout << (char) data.m_data[i];
+            }
+        } break;
         
         case Instruction::Interrupt: {
             return false;
